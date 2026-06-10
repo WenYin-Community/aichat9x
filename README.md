@@ -38,9 +38,9 @@
 ## 项目架构 / Architecture
 
 ```
-+---------------------+         HTTP (plain text)         +------------------+
++---------------------+     HTTP (JSON or plain text)     +------------------+
 |   AIChat Client     |  ────────────────────────────────  |  AIChatProxy     |
-|   (Delphi 7)        |         GBK / UTF-8               |  (Python Flask)  |
+|   (Delphi 7)        |         JSON / GBK / UTF-8        |  (Python Flask)  |
 |   Windows 95/NT     |                                   |  LAN server      |
 +---------------------+                                   +--------┬─────────+
                                                                   │ HTTPS
@@ -50,6 +50,10 @@
                                                          | (OpenAI 等等)    |
                                                          +------------------+
 ```
+
+客户端维护多轮对话历史，以 JSON 格式发送完整消息列表至代理；代理自动在首位插入系统提示词。
+
+The client maintains multi-turn conversation history and sends the full message list as JSON to the proxy. The proxy prepends a system prompt automatically if configured.
 
 ---
 
@@ -75,7 +79,8 @@ python proxy.py
 验证代理是否运行 / Verify the proxy is running:
 
 ```bash
-curl http://localhost:8080/ping
+curl http://localhost:8080/ping    # 健康检查 / health check
+curl http://localhost:8080/status  # 代理配置信息（不含密钥）/ proxy config (no secrets)
 ```
 
 ### 2. 编译客户端 / Build the Client
@@ -133,6 +138,7 @@ aichat9x/
 │   ├── AIChatCtrls.pas       # 自绘 UI 控件 / Custom-drawn UI controls
 │   ├── AIChatHttp.pas        # WinInet HTTP 客户端 / WinInet HTTP client
 │   ├── AIChat.ini            # 运行时配置 / Runtime config
+│   ├── AIChat.chat           # 聊天记录（运行时生成）/ Chat history (runtime)
 │   └── BIN/                  # 编译输出 / Build output
 │       └── AIChat.exe
 ├── AIChatProxy/              # Python 代理 / Python proxy
@@ -150,8 +156,12 @@ aichat9x/
 ## 技术限制 / Technical Constraints
 
 - **GDI 限制**：客户端仅使用 `gdi32.dll` 和 `user32.dll` 中的 GDI 函数，不依赖 `msimg32.dll`（Windows 95/NT 不提供）。
-- **编码处理**：代理自动处理 GBK（客户端）与 UTF-8（AI API）之间的双向编码转换。
+- **多轮对话**：客户端在内存中维护完整消息历史，以 JSON 格式发送至代理；聊天历史可保存/加载至 `.chat` 文件。
+- **编码处理**：客户端与代理间使用 UTF-8 JSON 通信；代理与 AI API 间使用 UTF-8 JSON；旧版纯文本模式仍兼容 GBK。
+- **连接测试**：客户端菜单 `File → Test Connection` 可验证代理是否可达。
 - **文件编码**：Delphi 源文件（`.pas`、`.dfm`、`.dpr`）必须为 ASCII 编码、CRLF 换行。
 - **GDI limitation**: The client only uses GDI functions from `gdi32.dll` and `user32.dll`; it does not depend on `msimg32.dll` (unavailable on Windows 95/NT).
-- **Encoding**: The proxy handles bidirectional encoding conversion between GBK (client) and UTF-8 (AI API) automatically.
+- **Multi-turn conversation**: The client maintains full message history in memory and sends it as JSON to the proxy. Chat history can be saved/loaded to a `.chat` file.
+- **Encoding**: Client and proxy communicate via UTF-8 JSON; proxy and AI API via UTF-8 JSON. Legacy plain-text mode still supports GBK.
+- **Connection test**: Client menu `File → Test Connection` verifies proxy reachability.
 - **File encoding**: Delphi source files (`.pas`, `.dfm`, `.dpr`) must use ASCII encoding with CRLF line endings.

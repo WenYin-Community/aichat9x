@@ -108,6 +108,18 @@ object frmAIChat: TfrmAIChat
         Caption = '&Clear Chat'
         OnClick = Clear1Click
       end
+      object TestConn1: TMenuItem
+        Caption = '&Test Connection'
+        OnClick = TestConn1Click
+      end
+      object LoadChat1: TMenuItem
+        Caption = '&Load Chat'
+        OnClick = LoadChat1Click
+      end
+      object SaveChat1: TMenuItem
+        Caption = '&Save Chat'
+        OnClick = SaveChat1Click
+      end
       object N1: TMenuItem
         Caption = '-'
       end

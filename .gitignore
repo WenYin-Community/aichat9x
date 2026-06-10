@@ -1,4 +1,5 @@
 AIChatProxy/.env
 *.log
+*.chat
 __pycache__/
 *.pyc
