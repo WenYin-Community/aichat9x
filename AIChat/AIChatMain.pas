@@ -267,8 +267,9 @@ begin
       Reply := 'ERROR: no response from proxy'
     else if (Length(Reply) > 5) and (Copy(Reply, 1, 5) = 'ERROR') then
       { already an error message, show as-is }
-    else
+    else if (Length(Reply) > 0) and (Reply[1] = '{') then
     begin
+      { JSON response: parse reply field }
       Err := '';
       Reply := ParseReply(Reply, Err);
       if Err <> '' then
@@ -276,6 +277,7 @@ begin
       else if Reply = '' then
         Reply := 'ERROR: empty AI response';
     end;
+    { else: plain text response, show as-is }
     AddMessage('AI', Reply);
   finally
     btnSend.Enabled := True;
