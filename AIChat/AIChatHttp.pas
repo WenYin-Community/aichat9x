@@ -64,7 +64,6 @@ begin
         if JsonMode then
           hdr := 'Content-Type: application/json; charset=utf-8' + #13#10
                + 'Content-Length: ' + IntToStr(Length(BodyBytes)) + #13#10
-               + 'Connection: close' + #13#10
         else
           hdr := 'Content-Type: text/plain' + #13#10
                + 'Content-Length: ' + IntToStr(Length(BodyBytes)) + #13#10;
