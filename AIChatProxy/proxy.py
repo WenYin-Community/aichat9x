@@ -119,6 +119,11 @@ def chat():
         log.info('Text request: %.80s', user_msg)
         messages = [{'role': 'user', 'content': user_msg}]
 
+    # Map client display roles to API roles
+    role_map = {'You': 'user', 'AI': 'assistant', 'System': 'system'}
+    for m in messages:
+        m['role'] = role_map.get(m['role'], m['role'])
+
     # Prepend system prompt if configured and not already present
     if SYS_PROMPT:
         if not messages or messages[0].get('role') != 'system':
