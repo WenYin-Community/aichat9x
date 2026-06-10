@@ -58,6 +58,7 @@ type
     procedure SaveChatToFile;
     procedure LoadChatFromFile;
     function EncodeMessages: AnsiString;
+    function EncodePlainText: AnsiString;
   public
   end;
 
@@ -110,6 +111,24 @@ begin
        + '","content":"' + AnsiString(JsonEscape(FHistory[I].Content)) + '"}';
   end;
   Result := S + ']}';
+end;
+
+function TfrmAIChat.EncodePlainText: AnsiString;
+var
+  I: Integer;
+  S: AnsiString;
+begin
+  S := '';
+  for I := 0 to High(FHistory) do
+  begin
+    if FHistory[I].Role = 'System' then Continue;
+    if S <> '' then S := S + #10;
+    S := S + AnsiString(FHistory[I].Role) + ': '
+       + AnsiString(StringReplace(
+           StringReplace(FHistory[I].Content, #13#10, ' ', [rfReplaceAll]),
+           #10, ' ', [rfReplaceAll]));
+  end;
+  Result := S;
 end;
 
 function ParseReply(const JsonStr: string; out Error: string): string;
@@ -243,7 +262,7 @@ begin
   Screen.Cursor := crHourGlass;
   try
     Reply := HttpPost(FProxyHost, FProxyPort, '/chat',
-              string(EncodeMessages), True);
+              string(EncodePlainText), False);
     if Reply = '' then
       Reply := 'ERROR: no response from proxy'
     else if (Length(Reply) > 5) and (Copy(Reply, 1, 5) = 'ERROR') then

@@ -117,7 +117,16 @@ def chat():
             return Response('ERROR: empty message', status=400,
                             mimetype='text/plain; charset=gbk')
         log.info('Text request: %.80s', user_msg)
-        messages = [{'role': 'user', 'content': user_msg}]
+        # Parse multi-turn: "You: msg\nAI: reply\nYou: msg"
+        messages = []
+        for line in user_msg.split('\n'):
+            line = line.strip()
+            if line.startswith('You: '):
+                messages.append({'role': 'user', 'content': line[5:]})
+            elif line.startswith('AI: '):
+                messages.append({'role': 'assistant', 'content': line[4:]})
+        if not messages:
+            messages = [{'role': 'user', 'content': user_msg}]
 
     # Map client display roles to API roles
     role_map = {'You': 'user', 'AI': 'assistant', 'System': 'system'}
