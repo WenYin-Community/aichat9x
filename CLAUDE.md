@@ -28,7 +28,7 @@ No automated tests exist. Health check: `curl http://localhost:8080/ping`. Statu
 ## Architecture
 
 - **`AIChat/`** — Delphi 7 client. UI is owner-drawn using only `gdi32.dll`/`user32.dll` (no `msimg32.dll` — unavailable on Win95/NT). HTTP via WinInet API in `AIChatHttp.pas`. Config from companion `.ini` file.
-- **`AIChatProxy/`** — Single-file Flask proxy (`proxy.py`). Three endpoints: `POST /chat` (JSON or legacy plain-text), `GET /ping`, `GET /status`. Stateless — multi-turn history is maintained client-side. Handles GBK ↔ UTF-8 conversion between client and API.
+- **`AIChatProxy/`** — Single-file Flask proxy (`proxy.py`). Three endpoints: `POST /chat` (plain-text multi-turn or JSON), `GET /ping`, `GET /status`. Stateless — multi-turn history is maintained client-side. Handles GBK ↔ UTF-8 conversion between client and API.
 
 ## Coding Conventions
 
@@ -49,7 +49,7 @@ No automated tests exist. Health check: `curl http://localhost:8080/ping`. Statu
 
 ## Runtime Constraints
 
-- Client supports multi-turn conversation (history maintained in memory, sent as JSON messages array)
+- Client supports multi-turn conversation (history maintained in memory, sent as plain text: `You: msg\nAI: reply`)
 - Chat history persisted to `.chat` file; auto-loaded on startup
 - 4KB read buffer limit in `AIChatHttp.pas` (loop-reads handle larger responses)
 - Proxy has no streaming support — waits for full AI response before returning

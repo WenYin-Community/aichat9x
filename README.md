@@ -38,22 +38,22 @@
 ## 项目架构 / Architecture
 
 ```
-+---------------------+     HTTP (JSON or plain text)     +------------------+
-|   AIChat Client     |  ────────────────────────────────  |  AIChatProxy     |
-|   (Delphi 7)        |         JSON / GBK / UTF-8        |  (Python Flask)  |
-|   Windows 95/NT     |                                   |  LAN server      |
-+---------------------+                                   +--------┬─────────+
-                                                                  │ HTTPS
-                                                                  ▼
++---------------------+     HTTP (plain text, multi-turn)   +------------------+
+|   AIChat Client     |  ────────────────────────────────   |  AIChatProxy     |
+|   (Delphi 7)        |     "You: msg\nAI: reply\n..."      |  (Python Flask)  |
+|   Windows 95/NT     |         GBK / UTF-8                 |  LAN server      |
++---------------------+                                     +--------┬─────────+
+                                                                    │ HTTPS
+                                                                    ▼
                                                          +------------------+
                                                          |   AI API         |
                                                          | (OpenAI 等等)    |
                                                          +------------------+
 ```
 
-客户端维护多轮对话历史，以 JSON 格式发送完整消息列表至代理；代理自动在首位插入系统提示词。
+客户端维护多轮对话历史，以纯文本格式发送（`You: 消息\nAI: 回复`）；代理解析后转为标准 messages 数组，自动插入系统提示词。
 
-The client maintains multi-turn conversation history and sends the full message list as JSON to the proxy. The proxy prepends a system prompt automatically if configured.
+The client maintains multi-turn conversation history and sends it as plain text (`You: msg\nAI: reply`). The proxy parses this into a standard messages array and prepends a system prompt if configured.
 
 ---
 
@@ -156,12 +156,12 @@ aichat9x/
 ## 技术限制 / Technical Constraints
 
 - **GDI 限制**：客户端仅使用 `gdi32.dll` 和 `user32.dll` 中的 GDI 函数，不依赖 `msimg32.dll`（Windows 95/NT 不提供）。
-- **多轮对话**：客户端在内存中维护完整消息历史，以 JSON 格式发送至代理；聊天历史可保存/加载至 `.chat` 文件。
-- **编码处理**：客户端与代理间使用 UTF-8 JSON 通信；代理与 AI API 间使用 UTF-8 JSON；旧版纯文本模式仍兼容 GBK。
+- **多轮对话**：客户端在内存中维护完整消息历史，以纯文本格式（`You: 消息\nAI: 回复`）发送至代理；聊天历史可保存/加载至 `.chat` 文件。
+- **编码处理**：客户端与代理间使用 GBK/UTF-8 纯文本通信；代理与 AI API 间使用 UTF-8 JSON。
 - **连接测试**：客户端菜单 `File → Test Connection` 可验证代理是否可达。
 - **文件编码**：Delphi 源文件（`.pas`、`.dfm`、`.dpr`）必须为 ASCII 编码、CRLF 换行。
 - **GDI limitation**: The client only uses GDI functions from `gdi32.dll` and `user32.dll`; it does not depend on `msimg32.dll` (unavailable on Windows 95/NT).
-- **Multi-turn conversation**: The client maintains full message history in memory and sends it as JSON to the proxy. Chat history can be saved/loaded to a `.chat` file.
-- **Encoding**: Client and proxy communicate via UTF-8 JSON; proxy and AI API via UTF-8 JSON. Legacy plain-text mode still supports GBK.
+- **Multi-turn conversation**: The client maintains full message history in memory and sends it as plain text (`You: msg\nAI: reply`) to the proxy. Chat history can be saved/loaded to a `.chat` file.
+- **Encoding**: Client and proxy communicate via GBK/UTF-8 plain text; proxy and AI API via UTF-8 JSON.
 - **Connection test**: Client menu `File → Test Connection` verifies proxy reachability.
 - **File encoding**: Delphi source files (`.pas`, `.dfm`, `.dpr`) must use ASCII encoding with CRLF line endings.
