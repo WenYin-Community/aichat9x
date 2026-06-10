@@ -57,6 +57,7 @@ type
     procedure UpdateStatus;
     procedure SaveChatToFile;
     procedure LoadChatFromFile;
+    function EncodeMessages: AnsiString;
   public
   end;
 
@@ -96,7 +97,7 @@ begin
   end;
 end;
 
-function EncodeMessages: AnsiString;
+function TfrmAIChat.EncodeMessages: AnsiString;
 var
   I: Integer;
   S: AnsiString;

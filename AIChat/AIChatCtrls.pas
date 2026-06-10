@@ -223,6 +223,7 @@ procedure TChatBubblePanel.UpdateScrollbar;
 var
   si: TScrollInfo;
 begin
+  if not HandleAllocated then Exit;
   FillChar(si, SizeOf(si), 0);
   si.cbSize := SizeOf(si);
   si.fMask := SIF_RANGE or SIF_PAGE or SIF_POS;
