@@ -16,8 +16,8 @@ implementation
 uses Windows, SysUtils, WinInet;
 
 const
-  HTTP_CONNECT_TIMEOUT = 10000;  // 10 s
-  HTTP_READ_TIMEOUT    = 120000; // 120 s (AI replies can be slow)
+  HTTP_CONNECT_TIMEOUT = 30000;  // 30 s
+  HTTP_READ_TIMEOUT    = 300000; // 5 min (AI replies can be slow)
 
 procedure ApplyTimeouts(hReq: HINTERNET);
 var
